@@ -1,0 +1,62 @@
+version: '2'
+
+networks:
+  registrynet:
+    driver: bridge
+
+services:
+  redis:
+    image: dimaskiddo/alpine:redis-4.0
+    user: root
+    networks:
+      - registrynet
+    volumes:
+      - ./redis:/var/lib/redis/data
+    restart: always
+
+  registry:
+    image: registry:2
+    networks:
+      - registrynet
+    environment:
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/example_com.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/example_com.key
+      - REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR=redis
+      - REGISTRY_REDIS_ADDR=redis:6379
+    volumes:
+      - ./registry/data:/var/lib/registry
+      - ./registry/auth:/auth
+      - ./haproxy/certs:/certs
+    depends_on:
+      - redis
+    restart: always
+
+  registry-ui:
+    image: joxit/docker-registry-ui:static
+    networks:
+      - registrynet
+    environment:
+      - REGISTRY_TITLE=Registry
+      - REGISTRY_URL=https://registry:5000
+    depends_on:
+      - registry
+    restart: always
+
+  haproxy:
+    image: haproxy:2.2-alpine
+    networks:
+      - registrynet
+    ports:
+      - 80:80
+      - 443:443
+      - 9000:9000
+    volumes:
+      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./haproxy/certs:/certs
+    depends_on:
+      - registry-ui
+      - registry
+    restart: always
