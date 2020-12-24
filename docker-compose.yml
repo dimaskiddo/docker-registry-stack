@@ -26,6 +26,7 @@ services:
       - REGISTRY_HTTP_TLS_KEY=/certs/example_com.key
       - REGISTRY_STORAGE_CACHE_BLOBDESCRIPTOR=redis
       - REGISTRY_REDIS_ADDR=redis:6379
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
     volumes:
       - ./registry/data:/var/lib/registry
       - ./registry/auth:/auth
@@ -39,8 +40,10 @@ services:
     networks:
       - registrynet
     environment:
-      - REGISTRY_TITLE=Registry
+      - REGISTRY_TITLE=Private Registry
       - REGISTRY_URL=https://registry:5000
+      - PULL_URL=registry.example.com
+      - DELETE_IMAGES=true
     depends_on:
       - registry
     restart: always

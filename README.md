@@ -49,14 +49,16 @@ cat haproxy/certs/example_com.crt haproxy/certs/example_com.key > haproxy/certs/
 ```
 * Configure your docker-compose.yml
 ```sh
-# Configure the registry service environment variable section
+# Configure the registry service environment variable section (line 25, 26, 43, 45)
 # In this case related to the SSL/TLS certficate file name (if you are using different name rather than example_com.*)
+# Also any Domain FQDN used need to be changed
 vi docker-compose.yml
 ```
 * Configure your haproxy/haproxy.cfg
 ```sh
 # Configure the SSL/TLS termination and the Hostname for Registry and the Registry UI (line 36, 41, 42)
 # In this case related to the SSL/TLS certficate file name (if you are using different name rather than example_com.*)
+# Also any Domain FQDN used need to be changed
 vi haproxy/haproxy.cfg
 ```
 * Start the Container Registry Stack
