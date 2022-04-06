@@ -6,7 +6,7 @@ networks:
 
 services:
   redis:
-    image: dimaskiddo/alpine:redis-4.0
+    image: dimaskiddo/alpine:keydb-6.2
     user: root
     networks:
       - registrynet
